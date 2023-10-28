@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<!--
+# 这是个用于布置视频直播画面背景的网页
+# 使用OBS等软件调用，调用时尺寸设置为1920*1080，框内黑色部分放置16:9尺寸的视频画面
+# 使用本站代码请保留出处 By: siitake.cn
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>LiveBG</title>
+        <style>
+            @font-face {
+                font-family: clockLcd;
+                src: url('./src/lcd.ttf');
+            }
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0);
+            }
+            #bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 1920px;
+                height: 1080px;
+                background-color: pink;
+            }
+            #bgrepeat {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 1920px;
+                height: 1080px;
+                background-repeat: repeat;
+                background-position: 0 0;
+            }
+            .mask {
+                -webkit-mask-size: 1920px 1080px;
+                -webkit-mask-repeat: no-repeat;
+                -webkit-mask-position: 0 0;
+                -webkit-mask-composite: xor;
+            }
+            .mask1 {
+                -webkit-mask: url(./src/mask1.png);
+            }
+            .mask2 {
+                -webkit-mask: url(./src/mask2.png);
+            }
+            .bgr-bilicopy {
+                background-image: url(./src/bilibili_copyright_1.jpg);
+                background-size: 256px;
+                animation: bgr-bilicopy 10s infinite linear;
+                opacity: .4;
+            }
+            @keyframes bgr-bilicopy {
+                0% { background-position: 0 0; }
+                100% { background-position: calc(256px * 2) calc(256px * -1); }
+            }
+            .bgr-square {
+                background-image: url(./src/square.png);
+                background-size: calc(54px / 2.5);
+                animation: bgr-square 1s infinite linear;
+                opacity: .4;
+            }
+            @keyframes bgr-square {
+                0% { background-position: 0 0; }
+                100% { background-position: calc(54px / 1.25) calc(54px / -2.5); }
+            }
+            .bgr-bililive1 {
+                background-image: url(./src/bg_horiz1_m.jpg);
+                background-size: 256px;
+                animation: bgr-bililive1 10s infinite linear;
+                opacity: .2;
+            }
+            @keyframes bgr-bililive1 {
+                0% { background-position: 0 0; }
+                100% { background-position: calc(256px * 2) calc(251px * -1); }
+            }
+            #video {
+                position: fixed;
+                top: 55px;
+                left: 55px;
+                width: 1600px;
+                height: 900px;
+                background-color: rgba(0, 0, 0, 0);
+                border: 15px solid whitesmoke;
+                border-radius: 5px;
+                box-shadow: 0 0 5px lightgray;
+            }
+            #ding span {
+                display: block;
+                position: fixed;
+                width: 9px;
+                height: 9px;
+                border-radius: 9px;
+                background-color: whitesmoke;
+                box-shadow: 0 0 3px gray;
+            }
+            #ding span:nth-child(1) {
+                top: calc(55px + 5px);
+                left: calc(55px + 5px);
+            }
+            #ding span:nth-child(2) {
+                top: calc(55px + 5px);
+                left: calc(55px + 5px + 1600px + 10px);
+            }
+            #ding span:nth-child(3) {
+                top: calc(55px + 5px + 900px + 10px);
+                left: calc(55px + 5px);
+            }
+            #ding span:nth-child(4) {
+                top: calc(55px + 5px + 900px + 10px);
+                left: calc(55px + 5px + 1600px + 10px);
+            }
+            #desc {
+                position: fixed;
+                top: calc(60px + 900px + 30px);
+                left: 60px;
+            }
+            #desc #input {
+                display: block;
+                width: 1620px;
+                height: 60px;
+                border: none;
+                box-shadow: none;
+                background-color: rgba(0, 0, 0, 0);
+                color: white;
+                font-size: 50px;
+                line-height: 60px;
+                font-family: '月有众星我只要你';
+            }
+            #side {
+                position: fixed;
+                top: 60px;
+                left: calc(60px + 1600px + 35px);
+                width: 200px;
+            }
+            #clock {
+                width: 100%;
+                height: 65px;
+                margin-top: 140px;
+                background-color: whitesmoke;
+                color: pink;
+                font-family: clockLcd;
+                font-size: 52px;
+                border-radius: 15px 15px 5px 5px;
+                box-shadow: 0 0 3px lightgray;
+                user-select: none;
+            }
+            .clock::after {
+                content: "";
+                display: block;
+                position: relative;
+                left: 25px;
+                bottom: 215px;
+                width: 150px;
+                height: 150px;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+            .c1::after {
+                background-image: url('./src/2233_1.gif');
+            }
+            .c2::after {
+                background-image: url('./src/2233_2.gif');
+            }
+            .c3::after {
+                background-image: url('./src/2233_3.gif');
+            }
+            .c4::after {
+                background-image: url('./src/2233_4.gif');
+            }
+            .c5::after {
+                background-image: url('./src/2233_5.gif');
+            }
+            .c6::after {
+                background-image: url('./src/2233_6.gif');
+            }
+            .c7::after {
+                background-image: url('./src/2233_7.gif');
+            }
+            #myclock {
+                text-align: center;
+                line-height: 65px;
+            }
+            #avatar {
+                display: none;
+                position: fixed;
+                top: 855px;
+                left: 1710px;
+                width: 175px;
+                height: 175px;
+                background-color: rgba(0, 0, 0, 0);
+                border: 5px solid white;
+                border-radius: 175px;
+                box-shadow: 0 0 3px lightgray;
+            }
+            #maomao {
+                display: none;
+                position: fixed;
+                bottom: 80px;
+                right: -10px;
+                width: 114px;
+                height: 140px;
+                background-image: url(https://siitake.cn/src/mao.svg);
+                background-position: center;
+                background-size: cover;
+                background-repeat: no-repeat;
+                transition: background .3s;
+            }
+        </style>
+    </head>
+    <body onload="disptime()">
+        <div id="bg" class="mask mask1"></div>
+        <div id="bgrepeat" class="mask mask1 bgr-bilicopy"></div>
+        <div id="video"></div>
+        <div id="ding">
+            <span></span><span></span>
+            <span></span><span></span>
+        </div>
+        <div id="desc">
+            <p id="input" contenteditable="true">⭐</p>
+        </div>
+        <div id="side">
+            <div id="clock" class="clock c1">
+                <p id="myclock"></p>
+            </div>
+        </div>
+        <div id="avatar"></div>
+        <div id="maomao"></div>
+        <script type="text/javascript">
+            /**
+             * object转化成url拼接样式
+             * @param obj 需要转化的参数
+             */
+            var objToUrl = function(obj) {
+                let arr = [];
+                for(let i in obj){
+                    if (obj.hasOwnProperty(i)) {
+                        arr.push(encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]));
+                    }
+                }
+                return arr.join("&");
+            }
+            /**
+             * url转化成object拼接样式
+             * @param url 需要转化的参数
+             */
+            var urlToObj = function(url) {
+                let string = url.split('&');
+                let res = {};
+                for(let i = 0;i<string.length;i++){
+                    let str = string[i].split('=');
+                    if(str[0]!=''){
+                        res[str[0]]=str[1];
+                    }
+                }
+                return res;
+            }
+            var disptime = function(){
+                var today = new Date();
+                var hh = today.getHours();
+                var mm = today.getMinutes() < 10 ? '0' + today.getMinutes() : today.getMinutes();
+                var ss = today.getSeconds() < 10 ? '0' + today.getSeconds() : today.getSeconds();
+                document.getElementById("myclock").innerHTML = hh + ":" + mm + ":" + ss;
+            }
+            var mytime = setInterval("disptime()",1000);
+            var urlParameters = location.search.replace('?', '');
+            var res = urlToObj(urlParameters);
+            var mask = '1';
+            if(res.clock) {
+                var class_name = "clock c" + res.clock;
+                document.getElementById('clock').className = class_name;
+            }
+            if(res.clock_color) {
+                document.getElementById('clock').style.color = res.clock_color;
+            }
+            if(res.avatar) {
+                if(res.avatar == 'on') {
+                    document.getElementById('avatar').style.display = 'block';
+                    mask = '2';
+                    document.getElementById('bg').className = 'mask mask' + mask;
+                }
+                if(res.avatar == 'cat') {
+                    document.getElementById('maomao').style.display = 'block';
+                }
+            }
+            if(res.bgrepeat) {
+                if(res.bgrepeat != 'off') {
+                    document.getElementById('bgrepeat').style.display = 'block';
+                    document.getElementById('bgrepeat').className = 'mask mask' + mask + ' bgr-' + res.bgrepeat;
+                }
+            }
+            if(res.desc) {
+                document.getElementById('input').innerHTML = decodeURIComponent(res.desc);
+            }
+            if(res.desc_color) {
+                document.getElementById('input').style.color = res.desc_color;
+            }
+            if(res.bg_color) {
+                document.getElementById('bg').style.backgroundColor = res.bg_color;
+            }
+        </script> 
+    </body>
+</html>

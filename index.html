@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<!--
+# 这是个可视化配置面板，与直播背景网页配合使用
+# 使用本站代码请保留出处 By: siitake.cn
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>LiveBG 初始化</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                background-color: darkgray;
+                background-image: url(./src/square.png);
+                background-position: center;
+                background-size: calc(54px / 3);
+            }
+            body::after, body::before {
+                content: '';
+                background-image: url('./src/rou.gif');
+                background-size: cover;
+                width: calc(294px / 2);
+                height: calc(209px / 2);
+                position: fixed;
+                bottom: 0;
+            }
+            body::before {
+                left: 0;
+                transform: rotateY(180deg);
+            }
+            body::after {
+                right: 0;
+            }
+            .main {
+                position: relative;
+                width: 1360px;
+                min-height: 675px;
+                margin: 100px auto;
+                border-radius: 3px;
+                background-color: rgba(255, 255, 255, .2);
+                backdrop-filter: blur(2px);
+            }
+            #livebg {
+                display: block;
+                position: absolute;
+                width: 1920px;
+                height: 1080px;
+                top: 30px;
+                left: 30px;
+                background-image: url(./src/alpha1.png);
+                background-size: 25px;
+                background-position: center;
+                border-radius: 6px;
+                box-shadow: none;
+                transform-origin : 0 0 0;
+                transform: scale(0.5);
+                overflow: hidden;
+                border: none;
+            }
+            #setting {
+                position: absolute;
+                padding: 10px 15px;
+                width: 290px;
+                height: 520px;
+                top: 30px;
+                left: 1010px;
+                background-color: white;
+                border-radius: 3px;
+                overflow-x: hidden;
+                overflow-y: scroll;
+            }
+            #setting label {
+                font-size: 24px;
+                line-height: 30px;
+                display: block;
+                margin: 10px 0;
+                user-select: none;
+            }
+            #setting .clock {
+                display: inline-block;
+                width: 64px;
+                height: 64px;
+                border: none;
+            }
+            #setting .clock::before {
+                display: inline-block;
+                width: 64px;
+                height: 64px;
+                border-radius: 5px;
+                border: 2px solid whitesmoke;
+                box-sizing: border-box;
+                background-color: whitesmoke;
+                content: "";
+                background-size: cover;
+                background-position: center;
+            }
+            #setting .clock:checked::before {
+                border-color: skyblue;
+            }
+            #clock1::before {
+                background-image: url(./src/2233_1.gif);
+            }
+            #clock2::before {
+                background-image: url(./src/2233_2.gif);
+            }
+            #clock3::before {
+                background-image: url(./src/2233_3.gif);
+            }
+            #clock4::before {
+                background-image: url(./src/2233_4.gif);
+            }
+            #clock5::before {
+                background-image: url(./src/2233_5.gif);
+            }
+            #clock6::before {
+                background-image: url(./src/2233_6.gif);
+            }
+            #clock7::before {
+                background-image: url(./src/2233_7.gif);
+            }
+            #setting input[type="text"] {
+                width: 100%;
+                height: 48px;
+                line-height: 48px;
+                font-size: 24px;
+                text-indent: 10px;
+                border: none;
+                border-radius: 5px;
+                background-color: whitesmoke;
+            }
+            #setting .radio-color, #setting .avatar, #setting .bgrepeat {
+                display: inline-block;
+                width: 48px;
+                height: 48px;
+                border: none;
+            }
+            #setting .radio-color::before, #setting .avatar::before, #setting .bgrepeat::before {
+                display: inline-block;
+                width: 48px;
+                height: 48px;
+                border-radius: 5px;
+                border: 2px solid whitesmoke;
+                box-sizing: border-box;
+                background-position: center;
+                font-size: 24px;
+                line-height: 48px;
+                text-align: center;
+            }
+            #setting .radio-color::before {
+                content: "";
+            }
+            #setting .radio-color:checked::before {
+                border-color: skyblue;
+                content: "🤍";
+                color: white;
+            }
+            .white::before {
+                background-color: white;
+            }
+            .pink::before {
+                background-color: pink;
+            }
+            .skyblue::before {
+                background-color: skyblue;
+            }
+            .orange::before {
+                background-color: orange;
+            }
+            .black::before {
+                background-color: black;
+            }
+            #setting .avatar::before, #bgrepeat-off::before {
+                background-color: whitesmoke;
+            }
+            #setting .avatar:checked::before, #setting .bgrepeat:checked::before {
+                border-color: skyblue;
+            }
+            #avatar-off::before, #bgrepeat-off::before {
+                content: "关";
+                color: red;
+            }
+            #avatar-on::before {
+                content: "开";
+                color: green;
+            }
+            #avatar-cat::before {
+                content: "🐱";
+                color: black;
+            }
+            #bgrepeat-bilicopy::before, #bgrepeat-square::before, #bgrepeat-bililive1::before {
+                content: "";
+                background-position: center;
+                background-color: white;
+            }
+            #bgrepeat-bilicopy::before {
+                background-image: url(./src/bilibili_copyright_1.jpg);
+                background-size: cover;
+            }
+            #bgrepeat-square::before {
+                background-image: url(./src/square.png);
+                background-size: calc(54px / 3);
+                background-repeat: repeat;
+            }
+            #bgrepeat-bililive1::before {
+                background-image: url(./src/bg_horiz1_m.jpg);
+                background-size: cover;
+            }
+            #setting textarea {
+                resize: none;
+                width: calc(100% - 20px);
+                height: 96px;
+                padding: 10px;
+                line-height: 32px;
+                font-size: 24px;
+                border: none;
+                border-radius: 5px;
+                background-color: whitesmoke;
+            }
+            #setting input[type="button"] {
+                min-width: 96px;
+                height: 48px;
+                line-height: 48px;
+                font-size: 24px;
+                color: white;
+                margin-top: 5px;
+                border: none;
+                border-radius: 5px;
+                background-color: black;
+            }
+            #setting input[type="button"]:hover {
+                background-color: skyblue;
+            }
+            #setting::-webkit-scrollbar-track-piece, textarea::-webkit-scrollbar-track-piece {
+                background: rgba(115, 115, 115, 0);
+            }
+            #setting::-webkit-scrollbar, textarea::-webkit-scrollbar {
+                width: 3px;
+                height: 3px;
+            }
+            #setting::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
+                height: 40px;
+                border-radius: 4px;
+                background-color: #A5A5A5;
+            }
+            #setting::-webkit-scrollbar-thumb:hover, textarea::-webkit-scrollbar-thumb:hover {
+                background-color: #66CCFF;
+            }
+            #copyurl {
+                position: absolute;
+                top: 590px;
+                left: 30px;
+                width: 1280px;
+                height: 34px;
+                padding: 10px;
+                font-size: 20px;
+                line-height: 34px;
+                text-indent: 90px;
+                border-radius: 3px;
+                background-color: whitesmoke;
+                user-select: all;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: pink;
+            }
+            #copyurl::before {
+                content: "复制(Ctrl+C)";
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 66px;
+                height: 44px;
+                padding: 5px 10px;
+                margin-right: 10px;
+                font-size: 18px;
+                line-height: 22px;
+                text-indent: 0;
+                text-align: center;
+                color: black;
+                white-space: pre-wrap;
+                background-color: lightgray;
+            }
+        </style>
+    </head>
+    <body onload="initBg()">
+        <div class="main">
+            <iframe id="livebg" title="LiveBG" src="https://siitake.cn/tools/bililive/game/video_border.html"></iframe>
+            <div id="setting">
+                <form id="setting-form" onchange="initBg()">
+                    <label for="clock">时钟表情</label>
+                    <input type="radio" name="clock" class="clock" id="clock1" value="1" checked />
+                    <input type="radio" name="clock" class="clock" id="clock2" value="2" />
+                    <input type="radio" name="clock" class="clock" id="clock3" value="3" />
+                    <input type="radio" name="clock" class="clock" id="clock4" value="4" />
+                    <input type="radio" name="clock" class="clock" id="clock5" value="5" />
+                    <input type="radio" name="clock" class="clock" id="clock6" value="6" />
+                    <input type="radio" name="clock" class="clock" id="clock7" value="7" />
+                    <label for="clock-color">时间颜色</label>
+                    <input type="radio" name="clock-color" class="radio-color pink" value="pink" checked />
+                    <input type="radio" name="clock-color" class="radio-color skyblue" value="skyblue" />
+                    <input type="radio" name="clock-color" class="radio-color orange" value="orange" />
+                    <input type="radio" name="clock-color" class="radio-color black" value="black" />
+                    <label for="avatar">头像设置</label>
+                    <input type="radio" name="avatar" class="avatar" id="avatar-on" value="on" checked />
+                    <input type="radio" name="avatar" class="avatar" id="avatar-off" value="off" />
+                    <input type="radio" name="avatar" class="avatar" id="avatar-cat" value="cat" />
+                    <label for="desc">标题文字</label>
+                    <textarea name="desc" id="desc" rows="4"></textarea>
+                    <label for="desc-color">标题颜色</label>
+                    <input type="radio" name="desc-color" class="radio-color white" value="white" checked />
+                    <input type="radio" name="desc-color" class="radio-color pink" value="pink" />
+                    <input type="radio" name="desc-color" class="radio-color skyblue" value="skyblue" />
+                    <input type="radio" name="desc-color" class="radio-color orange" value="orange" />
+                    <input type="radio" name="desc-color" class="radio-color black" value="black" />
+                    <label for="bgrepeat">背景填充</label>
+                    <input type="radio" name="bgrepeat" class="bgrepeat" id="bgrepeat-bilicopy" value="bilicopy" checked />
+                    <input type="radio" name="bgrepeat" class="bgrepeat" id="bgrepeat-bililive1" value="bililive1" />
+                    <input type="radio" name="bgrepeat" class="bgrepeat" id="bgrepeat-square" value="square" />
+                    <input type="radio" name="bgrepeat" class="bgrepeat" id="bgrepeat-off" value="off" />
+                    <label for="bg-color">背景颜色</label>
+                    <input type="radio" name="bg-color" class="radio-color pink" value="pink" checked />
+                    <input type="radio" name="bg-color" class="radio-color white" value="white" />
+                    <input type="radio" name="bg-color" class="radio-color skyblue" value="skyblue" />
+                    <input type="radio" name="bg-color" class="radio-color orange" value="orange" />
+                    <input type="radio" name="bg-color" class="radio-color black" value="black" />
+                </form>
+            </div>
+            <div id="copyurl">https://siitake.cn/tools/bililive/game/video_border.html</div>
+        </div>
+        <script type="text/javascript">
+            var objToUrl = function(obj) {
+                let arr = [];
+                for(let i in obj){
+                    if (obj.hasOwnProperty(i)) {
+                        arr.push(encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]));
+                    }
+                }
+                return arr.join("&");
+            }
+            var getRadioValueByName = function(name) {
+                var value = false;
+                var radios = document.getElementsByName(name);
+                for(var i = 0; i < radios.length; i++) {
+                    if(radios[i].checked) {
+                        value = radios[i].value;
+                    }
+                }
+                return value;
+            }
+            var getInputValueById = function(id) {
+                var value = false;
+                var input = document.getElementById(id);
+                if(input.value.trim() != "") {
+                    value = input.value;
+                }
+                return value;
+            }
+            var getTextareaValueById = function(id) {
+                var value = false;
+                var text = document.getElementById(id);
+                if(text.value.trim() != "") {
+                    value = text.value.trim();
+                }
+                return value;
+            }
+            var initBg = function() {
+                var obj = {};
+                var clock = getRadioValueByName("clock");
+                if(clock) {
+                    obj.clock = clock;
+                }
+                var clock_color = getRadioValueByName("clock-color");
+                if(clock_color) {
+                    obj.clock_color = clock_color;
+                    document.getElementById('copyurl').style.color = clock_color;
+                }
+                var avatar = getRadioValueByName("avatar");
+                if(avatar) {
+                    obj.avatar = avatar;
+                }
+                var bgrepeat = getRadioValueByName("bgrepeat");
+                if(bgrepeat) {
+                    obj.bgrepeat = bgrepeat;
+                }
+                var desc_color = getRadioValueByName("desc-color");
+                if(desc_color) {
+                    obj.desc_color = desc_color;
+                }
+                var bg_color = getRadioValueByName("bg-color");
+                if(bg_color) {
+                    obj.bg_color = bg_color;
+                }
+                var desc = getTextareaValueById("desc");
+                if(desc) {
+                    obj.desc = desc;
+                }
+                var param = objToUrl(obj);
+                var url = "https://siitake.cn/tools/bililive/game/video_border.html?" + param;
+                document.getElementById("livebg").src = url;
+                document.getElementById("copyurl").innerText = url;
+            }
+        </script> 
+    </body>
+</html>
